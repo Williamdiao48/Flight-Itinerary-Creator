@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang = "en">
+    <head>
+        <title>Flight Planner</title>
+        <link rel = "stylesheet" href = "styles.css">
+    </head>
+
+    <body>
+        <h1>Frugal Flyers</h1>
+        <div class = "main-layout">
+        <div class = "search-section">
+            <div class = "preference-section">
+                <label>Search Preference:</label>
+                <select name="mode" id="mode">
+                    <option value="frugal">Frugal (Cheapest)</option>
+                    <option value="balanced" selected>Balanced (Price & Speed)</option>
+                    <option value="fast">Fast (Quickest Path)</option>
+                    </select>
+            </div>
+        <hr class = "divider">
+        <div class = "search-bubble">
+            <div class = "input-group">
+            <label>From (IATA Code): </label>
+            <input id = "source" placeholder = "e.g. MAD" maxlength = "3">
+            </div>
+
+            <div class = "input-group">
+            <label>To (IATA Code): </label>
+            <input id = "destination" placeholder = "e.g. BCN" maxlength = "3">
+            </div>
+
+            <div class = "input-group">
+            <label>Departure Date: </label>
+            <input id = "departure_date" type = "date">
+            </div>
+
+            <div class = "input-group">
+            <label>Earliest Departure Time:</label>
+            <input id = "departure_time" type = "time" value = "08:00">
+            </div>
+
+            <button class = "plan-button" onclick = "planFlight()"> Find Flights</button>
+        </div>
+        </div>
+    </div>
+        <hr>
+        <div class = "results-section">
+            <div id = "loading" style = "display:none;">Calcuating optimal route...</div>
+            <pre id = "result"></pre>
+        </div>
+    
+        <script src = "app.js"></script>
+    </body>
+</html>
