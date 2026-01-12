@@ -9,4 +9,7 @@ cpp/planner.exe
 *.obj
 flights.csv
 *.log.DS_Store
+**.DS_Store
+.vscode/
+get-pip.py
 Thumbs.db
