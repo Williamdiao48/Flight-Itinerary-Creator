@@ -44,11 +44,11 @@ def plan_flight(request: PlanRequest):
     #1768925060
     print(adjusted_departure_time)
 
-    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-    PROJECT_ROOT = os.path.dirname(BASE_DIR)
+    BACKEND_DIR = os.path.dirname(os.path.abspath(__file__))
+    PROJECT_ROOT = os.path.dirname(BACKEND_DIR)
     FLIGHT_CSV_FILE_PATH = os.path.join(PROJECT_ROOT, "flights.csv")
-    PLANNER_PATH = os.path.join(BASE_DIR, "cpp", "planner")
-    AIRPORTS_TXT_PATH = os.path.join(BASE_DIR, "cpp", "airports.txt")
+    PLANNER_PATH = os.path.join(BACKEND_DIR, "cpp", "planner")
+    AIRPORTS_TXT_PATH = os.path.join(BACKEND_DIR, "cpp", "airports.txt")
 
     flight_data = plan_trip(request)
     write_flights_to_csv(flight_data, filename=FLIGHT_CSV_FILE_PATH)
