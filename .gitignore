@@ -22,6 +22,9 @@ backend/cpp/planner.exe
 # Locally generated flight data
 flights.csv
 
+# Local developer notes, never shipped
+internal-docs/
+
 # Editor / tooling local state
 .clangd
 .vscode/
