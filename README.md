@@ -233,7 +233,6 @@ that round-trip.
 backend/
   main.py, services.py, models.py    API, provider, schemas
   setup.py                           builds the C++ extension
-  utils.py                           unused; see notes below
   cpp/
     tp.*, fm.*, bstset.h             the search engine
     provided.*                       base classes and haversine distance
@@ -251,10 +250,6 @@ missing, so a fresh checkout needs no manual step.
 
 - **`adults` is ignored.** The field is accepted, but the Duffel request
   hardcodes a single adult passenger. Group pricing is not implemented.
-- **`backend/utils.py` is dead code.** `write_flights_to_csv` served the old
-  design, where flights were written to disk and the planner ran as a
-  subprocess. The pybind11 bindings removed that boundary. Its C++ counterpart,
-  `FlightManager::load_flight_data`, is still live — the CLI above uses it.
 - **Layovers across a DST change at the connecting airport** can be off by an
   hour in the UI, which computes them from the local wall-clock strings. Fixing
   it properly means returning the UTC epochs alongside them.
