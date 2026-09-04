@@ -119,15 +119,18 @@ int main(int argc, char* argv[]) {
         travel_planner.add_preferred_airline(airline);
     }
 
-      // Now plan the itinerary
-    Itinerary itinerary;
-    bool result = travel_planner.plan_travel(source_airport, destination_airport, start_time, itinerary);
+      // Now plan the itinerary. plan_travel searches a departure window rather
+      // than a single instant, so treat the CLI's start_time as the opening of
+      // a 24-hour window and report the best result.
+    std::vector<Itinerary> itineraries = travel_planner.plan_travel(
+        source_airport, destination_airport, start_time, start_time + 24 * 3600, 1);
 
       // Print results
-    if (!result) {
+    if (itineraries.empty()) {
         std::cout << "No itineraries found matching your criteria.\n";
     }
     else {
+        const Itinerary& itinerary = itineraries.front();
           // Validate the itinerary
         std::string error_message;
         if (!validate_itinerary(

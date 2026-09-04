@@ -68,12 +68,13 @@ public:
        m_max_connections(std::numeric_limits<int>::max()),
        m_max_duration(24 * 3600),   // 24 hrs until set otherwise
        m_max_layover(12 * 3600),    // 12 hrs until set otherwise
-       m_min_connection_time(3600)  // 1 hr until set otherwise
+       m_min_connection_time(3600), // 1 hr until set otherwise
+       m_max_price(100000.0) 
     {}
     virtual ~TravelPlannerBase() {}
 
-    virtual bool plan_travel(std::string source_airport, std::string destination_airport,
-                             int start_time, Itinerary& itinerary) const = 0;
+    virtual std::vector<Itinerary> plan_travel(std::string source_airport, std::string destination_airport,
+                             int start_window, int end_window, int max_results = 3) const = 0;
     virtual void add_preferred_airline(std::string airline) = 0;
 
     const FlightManagerBase& get_flight_manager() const
@@ -116,13 +117,17 @@ public:
         return m_min_connection_time;
     }
 
-private:
+    virtual void set_max_price(double p) { m_max_price = p; }
+    virtual double get_max_price() const { return m_max_price; }
+
+protected:
     const FlightManagerBase& m_flight_manager;
     const AirportDB& m_airport_db;
     int m_max_connections;
     int m_max_duration;
     int m_max_layover;
     int m_min_connection_time;
+    double m_max_price;
 };
 
   // When testing, you may call this to check the validity of an Itinerary.

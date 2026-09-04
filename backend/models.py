@@ -8,6 +8,10 @@ class Flight(BaseModel):
     flight_no: int
     from_airport: str = Field(alias="from") 
     to_airport: str = Field(alias="to")
+    from_lat: Optional[float] = None
+    from_lon: Optional[float] = None
+    to_lat: Optional[float] = None
+    to_lon: Optional[float] = None
     departure: str
     arrival: str
     duration: int
@@ -22,10 +26,22 @@ class Itinerary(BaseModel):
     flights: List[Flight]
 
 class PlanRequest(BaseModel):
+    trip_type: str = "one-way" # "one-way" or "round-trip"
     source: str
     destination: str
     departure_date: str
-    departure_time: str = "08:00:00"
+    return_date: Optional[str] = None
+    departure_window_start: str = "00:00:00"
+    departure_window_end: str = "23:59:59"
     origin_timezone: Optional[str] = None
     search_mode: str
     adults: int = 1
+    max_layovers: Optional[int] = None
+    preferred_airlines: Optional[List[str]] = None
+    max_results: int = 3
+    max_duration_hours: Optional[int] = 48
+    max_price: Optional[float] = 100000.0
+
+class PlanResponse(BaseModel):
+    outbound: List[Itinerary]
+    return_flight: Optional[List[Itinerary]] = None
