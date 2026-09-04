@@ -199,6 +199,12 @@ async def plan_trip(source: str, destination: str, departure_date: str):
     return flights
 
 
+# How many candidate itineraries to pull from the planner per result shown. The
+# search stops at the first N it reaches, so over-fetching is what makes ranking
+# meaningful; the cap keeps a wide-open search from exploring without bound.
+OVERFETCH_FACTOR = 3
+OVERFETCH_CAP = 30
+
 async def run_cpp_planner_native(flights_data, source, destination, adjusted_window_start, adjusted_window_end, airports_txt_path, search_mode, max_layovers=None, preferred_airlines=None, max_results=3, max_duration_hours=48, max_price=100000.0):
     import asyncio
     import flight_planner_cpp # pyre-ignore
@@ -241,7 +247,12 @@ async def run_cpp_planner_native(flights_data, source, destination, adjusted_win
             for airline in preferred_airlines:
                 planner.add_preferred_airline(airline)
         
-        itineraries = planner.plan_travel(source, destination, adjusted_window_start, adjusted_window_end, max_results)
+        # plan_travel returns as soon as it has collected the requested number of
+        # itineraries, so asking for exactly max_results yields the first ones the
+        # A* frontier happens to reach -- not the best ones. Over-fetch, rank, then
+        # trim, so a dominated route can't occupy a slot ahead of a better one.
+        fetch_count = min(max(max_results * OVERFETCH_FACTOR, max_results + 5), OVERFETCH_CAP)
+        itineraries = planner.plan_travel(source, destination, adjusted_window_start, adjusted_window_end, fetch_count)
         
         results = []
         for itinerary in itineraries:
@@ -265,7 +276,15 @@ async def run_cpp_planner_native(flights_data, source, destination, adjusted_win
                 "total_cost": itinerary.total_cost,
                 "flights": res_flights
             })
-            
+
+        # Rank by the same objective the search minimizes: elapsed seconds plus
+        # price converted to seconds at the mode's exchange rate. Frugal weights a
+        # dollar at 1000s, fast at 1s, so the same set of routes orders differently
+        # per mode -- and the first result is the best one under the chosen mode.
+        price_weight = planner.get_price_weight()
+        results.sort(key=lambda it: it["total_duration"] + price_weight * it["total_cost"])
+        results = results[:max_results]
+
         end = time.time()
         print(f"Native PyBind11 execution time: {end - start:.4f}s")
         return results

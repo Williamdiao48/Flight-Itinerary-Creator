@@ -53,6 +53,7 @@ PYBIND11_MODULE(flight_planner_cpp, m) {
       .def("plan_travel", &TravelPlanner::plan_travel,
            py::arg("source_airport"), py::arg("destination_airport"),
            py::arg("start_window"), py::arg("end_window"), py::arg("max_results") = 3)
+      .def("get_price_weight", &TravelPlanner::get_price_weight)
       .def("set_max_duration", &TravelPlanner::set_max_duration)
       .def("get_max_duration", &TravelPlanner::get_max_duration)
       .def("set_max_price", &TravelPlanner::set_max_price)

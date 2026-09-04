@@ -128,6 +128,10 @@ public:
   }
   void set_max_connections(int m) { max_connections = m; }
   int get_max_connections() const { return max_connections; }
+  // The dollars-to-seconds exchange rate this mode searches with. Exposed so
+  // callers can rank finished itineraries by the same objective g(n) used
+  // during the search, instead of re-declaring the constants themselves.
+  double get_price_weight() const { return price_weight; }
   std::vector<Itinerary> plan_travel(std::string source_airport,
                                      std::string destination_airport,
                                      int start_window, int end_window, int max_results = 3) const override;
