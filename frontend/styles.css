@@ -1,183 +1,539 @@
-body{
-    background: #f4f7f6;
+:root {
+    --primary-color: #4f46e5;
+    --primary-hover: #4338ca;
+    --secondary-color: #10b981;
+    --bg-gradient: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+    --card-bg: rgba(255, 255, 255, 0.85);
+    --glass-border: rgba(255, 255, 255, 0.4);
+    --text-primary: #1f2937;
+    --text-secondary: #6b7280;
+    --box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+    --transition-fast: 0.2s ease;
 }
-.main-layout{
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg-gradient);
+    color: var(--text-primary);
     display: flex;
-    flex-direction:column;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
+
+h1 {
+    text-align: center;
+    font-size: 3rem;
+    font-weight: 800;
+    color: var(--primary-color);
+    text-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    margin-bottom: 30px;
+    letter-spacing: -1px;
+}
+
+.main-layout {
+    width: 100%;
+    max-width: 1200px;
+    display: flex;
+    flex-direction: column;
     gap: 30px;
-    font-family: sans-serif;
-    padding: 20px;
 }
-.preference-section{
-    gap: 10px;
+
+.search-section {
+    background: var(--card-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: var(--box-shadow);
     display: flex;
-    justify-content: flex-start;
+    flex-direction: column;
+    gap: 20px;
+    position: relative;
+    z-index: 9999;
 }
 
+.preference-section {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
 
-.search-section{
-    display:flex;
-    flex-wrap: wrap;
-    flex-direction:column;
-    max-width: 1500px;
-    gap:20px;
-    align-items: flex-start;
-    margin: auto;
+select,
+input {
+    padding: 12px 16px;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    font-size: 15px;
+    outline: none;
+    transition: all var(--transition-fast);
     background: white;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-.search-bubble{
-    display: flex;
-    gap:20px;
-    flex-direction:row;
+select:focus,
+input:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
 }
 
 .divider {
-    border: 0;            
-    height: 1px;          
-    background: #e0e0e0;  
-    margin: 0 0;       
-    width: 100%;          
-}
-
-.input-group{
-    height: 40px;
-    box-sizing: border-box;
-    display:flex;
-    flex-direction: row;
-    align-items: center;
-    gap:10px;
-
-}
-.plan-button{
-    height: 40px;
-    box-sizing: border-box;
-
-    background-color: #627ae9;
-    color: white;
-    padding: 10px 24px;
-    border: none;
-    border-radius: 6px;
-    font-size:16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.3s, transform 0.1s;
-    align-items: center;
-}
-.plan-button:hover{
-    background-color: #4a61d1;
-}
-.plan-button:active {
-    transform: scale(0.98);
-}
-
-
-
-.results-section{
-    margin: 0 auto;
-    max-width: 800px;
+    border: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.1), transparent);
     width: 100%;
+}
+
+.search-bubble {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    align-items: flex-end;
+}
+
+.input-group {
     display: flex;
     flex-direction: column;
-    align-items: stretch;
-    gap: 15px;
+    gap: 8px;
+    flex: 1 1 200px;
 }
-.flight-card{
+
+.input-group label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.button-container {
     display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    border: 1px solid #eee;
-    border-radius: 12px;
-    padding: 20px;
-    padding-left: 40px;
-    margin-bottom: 10px;
-    background: #fff;
-    box-sizing: border-box;
-    gap: 10px;
+    justify-content: center;
+    margin-top: 10px;
     width: 100%;
 }
 
+.plan-button {
+    background: var(--primary-color);
+    color: white;
+    padding: 14px 40px;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    flex: 0 0 auto;
+    height: 48px;
+    box-shadow: 0 4px 6px rgba(79, 70, 229, 0.3);
+}
+
+.plan-button:hover {
+    background: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(79, 70, 229, 0.4);
+}
+
+.plan-button:active {
+    transform: translateY(0);
+}
+
+.results-section {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    position: relative;
+    z-index: 1;
+}
+
+.flight-card {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 16px;
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+}
+
+.flight-card:hover {
+    transform: translateY(-4px) scale(1.01);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    border-color: rgba(79, 70, 229, 0.3);
+}
 
 .airline-section {
     flex: 0 0 120px;
-    font-weight: bold; 
-    font-size: large;
-    color: #007bff;
-    text-align: left;
-    display:flex;
-    justify-content: flex-start;
-    margin:0;
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: var(--primary-color);
 }
-.itinerary-section{
+
+.itinerary-section {
     flex-grow: 1;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 20px;
-    min-width: 0;
-    padding: 0 20px;
 }
+
 .timepoint {
     display: flex;
     flex-direction: column;
+    align-items: center;
+}
+
+.airport {
+    font-weight: 800;
+    font-size: 1.4rem;
+}
+
+.time {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    font-weight: 500;
+    margin-top: 4px;
+}
+
+.duration-line {
+    flex-grow: 1;
+    margin: 0 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+.flight-duration {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    background: #f3f4f6;
+    padding: 4px 12px;
+    border-radius: 20px;
+    z-index: 2;
+    font-weight: 600;
+}
+
+.line {
+    height: 2px;
+    background: #e5e7eb;
+    width: 100%;
+    position: absolute;
+    top: 50%;
+    z-index: 1;
+}
+
+.line::after {
+    content: '>';
+    position: absolute;
+    right: -10px;
+    top: -10px;
+    font-size: 14px;
+    color: #9ca3af;
+    font-weight: 800;
+}
+
+.price-section {
+    flex: 0 0 100px;
+    text-align: right;
+    border-left: 2px dashed #e5e7eb;
+    padding-left: 20px;
+}
+
+.price {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--secondary-color);
+}
+
+.summary {
+    background: var(--card-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    padding: 20px;
+    border-radius: 12px;
     text-align: center;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    box-shadow: var(--box-shadow);
+    margin-top: 10px;
 }
-.airport{
-    font-weight: bold;
-    font-size: 1.2em;
-}
-.time{
-    color: #5c5b5b;
-    font-size: 0.9em;
-}
-.duration-line{
+
+#loading {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    min-width: 100px;    
-}
-.line{
-    height: 2px;
-    background: #ccc;
+    gap: 15px;
+    padding: 40px;
+    color: var(--primary-color);
+    font-size: 1.1rem;
+    font-weight: 600;
     width: 100%;
-    margin-top: 4px;
+    box-sizing: border-box;
+    align-self: center;
+    text-align: center;
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(79, 70, 229, 0.2);
+    border-top: 4px solid var(--primary-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+h2 {
+    color: var(--text-primary);
+    margin-bottom: 10px;
+    width: 100%;
+    text-align: center;
+}
+
+/* Toast Notifications */
+#toast-container {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 9999;
+}
+
+.toast {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 24px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: var(--text-primary);
+    transform: translateX(120%);
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+.toast.show {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+.toast-error {
+    border-left: 6px solid #ef4444;
+}
+
+.toast-warning {
+    border-left: 6px solid #f59e0b;
+}
+
+.toast-info {
+    border-left: 6px solid #3b82f6;
+}
+
+.toast-success {
+    border-left: 6px solid #10b981;
+}
+
+.toast-icon {
+    font-size: 1.2rem;
+}
+
+/* Autocomplete Dropdown Styles */
+.autocomplete-container {
     position: relative;
 }
 
-
-.price-section {
-    text-align: right;
-    border-left: 1px solid #eee;
-    flex: 0 0 80px;
+.autocomplete-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    margin-top: 4px;
+    z-index: 9999;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    max-height: 250px;
+    overflow-y: auto;
 }
 
-.summary {
-    margin-top: 20px;
-    padding: 10px;
-    background: #e9ecef;
-    border-radius: 4px;
-    text-align: center;
+.dropdown-item {
+    padding: 10px 15px;
+    cursor: pointer;
+    border-bottom: 1px solid #f3f4f6;
+    display: flex;
+    flex-direction: column;
 }
 
-#loading{
-    align-self: center;
-    text-align: center;
-    padding: 40px;
-    font-weight: bold;
-    animation: pulse 1.5s infinite;
-}@keyframes pulse {
-    0% { opacity: 0.5; }
-    50% { opacity: 1; }
-    100% { opacity: 0.5; }
+.dropdown-item:last-child {
+    border-bottom: none;
 }
 
-h1{
+.dropdown-item:hover {
+    background-color: #f3f4f6;
+}
+
+.dropdown-iata {
+    font-weight: 800;
+    color: var(--primary-color);
+    font-size: 0.9rem;
+}
+
+.dropdown-name {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+/* Grouped Itinerary Card */
+.itinerary-card {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 16px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    border: 1px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.itinerary-card:hover {
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+    border-color: rgba(79, 70, 229, 0.3);
+}
+
+.itinerary-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px dashed #e5e7eb;
+    padding-bottom: 15px;
+    margin-bottom: 5px;
+}
+
+.itinerary-summary-info {
+    display: flex;
+    gap: 20px;
+}
+
+.itinerary-summary-info span {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    background: #f3f4f6;
+    padding: 6px 14px;
+    border-radius: 8px;
+}
+
+.itinerary-total-price {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--secondary-color);
+}
+
+.segment-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.segment-row {
+    display: flex;
+    align-items: center;
+    background: #f8fafc;
+    padding: 12px 20px;
+    border-radius: 10px;
+    gap: 20px;
+}
+
+.segment-airline {
+    flex: 0 0 100px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--primary-color);
+}
+
+.segment-path {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.segment-time {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+    margin-top: 2px;
+}
+
+.segment-duration-line {
+    flex-grow: 1;
+    margin: 0 20px;
     text-align: center;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: #2c3e50;
-    letter-spacing: 1px;
+    font-size: 0.8rem;
+    color: #9ca3af;
+    position: relative;
+}
+
+.segment-duration-line::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: #d1d5db;
+    z-index: 1;
+}
+
+.segment-duration-text {
+    background: #f8fafc;
+    padding: 0 8px;
+    position: relative;
+    z-index: 2;
+}
+
+.layover-row {
+    text-align: center;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #f59e0b;
+    padding: 4px 0;
+}
+
+#map {
+    width: 100%;
+    height: 350px;
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    display: none;
+    /* hidden until results load */
+    margin-bottom: 20px;
+    position: relative;
+    z-index: 10;
 }
