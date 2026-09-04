@@ -1,15 +1,35 @@
+# Secrets
 .env
+
+# Python
 **/__pycache__/
 *.py[cod]
 venv/
 .pytest_cache/
-cpp/planner
-cpp/planner.exe
+
+# Native extension build output
+*.so
 *.o
 *.obj
+build/
+.eggs/
+*.egg-info/
+
+# Compiled C++ CLI (path is backend/cpp, not cpp)
+backend/cpp/planner
+backend/cpp/planner.exe
+
+# Locally generated flight data
 flights.csv
-*.log.DS_Store
-**.DS_Store
+
+# Editor / tooling local state
+.clangd
 .vscode/
-get-pip.py
+*.log
+
+# OS cruft
+**/.DS_Store
 Thumbs.db
+
+# Bootstrap script, not a dependency
+get-pip.py
