@@ -318,6 +318,79 @@ function showToast(message, type = "info") {
   }, 4000);
 }
 
+// Leaflet draws a polyline as straight segments in the projected plane, which is
+// not the path an aircraft flies and not the path the C++ engine's great-circle
+// heuristic assumes when it estimates remaining cost. Interpolating along the
+// great circle makes the drawing agree with the algorithm. The difference is
+// invisible on a short domestic hop and pronounced on long or northerly routes.
+const GEODESIC_STEPS = 48;
+
+function toRadians(degrees) {
+  return degrees * Math.PI / 180;
+}
+
+function toDegrees(radians) {
+  return radians * 180 / Math.PI;
+}
+
+// Points along the great circle from start to end, endpoints included.
+function greatCirclePoints(start, end, steps = GEODESIC_STEPS) {
+  const lat1 = toRadians(start[0]);
+  const lon1 = toRadians(start[1]);
+  const lat2 = toRadians(end[0]);
+  const lon2 = toRadians(end[1]);
+
+  // Angular separation, by the same haversine the engine uses for distance.
+  const h = Math.sin((lat2 - lat1) / 2) ** 2 +
+    Math.cos(lat1) * Math.cos(lat2) * Math.sin((lon2 - lon1) / 2) ** 2;
+  const d = 2 * Math.asin(Math.min(1, Math.sqrt(h)));
+
+  // Coincident airports, or a missing coordinate, leave nothing to interpolate
+  // and would divide by sin(0) below.
+  if (!Number.isFinite(d) || d < 1e-9) {
+    return [start, end];
+  }
+
+  const points = [];
+  for (let i = 0; i <= steps; i++) {
+    const f = i / steps;
+    const a = Math.sin((1 - f) * d) / Math.sin(d);
+    const b = Math.sin(f * d) / Math.sin(d);
+    const x = a * Math.cos(lat1) * Math.cos(lon1) + b * Math.cos(lat2) * Math.cos(lon2);
+    const y = a * Math.cos(lat1) * Math.sin(lon1) + b * Math.cos(lat2) * Math.sin(lon2);
+    const z = a * Math.sin(lat1) + b * Math.sin(lat2);
+    points.push([
+      toDegrees(Math.atan2(z, Math.hypot(x, y))),
+      toDegrees(Math.atan2(y, x))
+    ]);
+  }
+  return points;
+}
+
+// One continuous great-circle path through every waypoint of the itinerary.
+function geodesicPath(waypoints) {
+  const path = [];
+  for (let i = 0; i < waypoints.length - 1; i++) {
+    const segment = greatCirclePoints(waypoints[i], waypoints[i + 1]);
+    // Each segment repeats the previous segment's final point; drop the duplicate.
+    path.push(...(i === 0 ? segment : segment.slice(1)));
+  }
+
+  // A route crossing the antimeridian produces longitudes that jump from +179 to
+  // -179. Leaflet would draw that jump as a line racing back across the whole
+  // map, so keep the sequence continuous by letting longitude run past +-180.
+  // Adjustments accumulate because each step compares against the fixed previous.
+  for (let i = 1; i < path.length; i++) {
+    const delta = path[i][1] - path[i - 1][1];
+    if (delta > 180) {
+      path[i][1] -= 360;
+    } else if (delta < -180) {
+      path[i][1] += 360;
+    }
+  }
+  return path;
+}
+
 function drawMap(flights) {
   const mapElement = document.getElementById('map');
   mapElement.style.display = 'block';
@@ -365,7 +438,7 @@ function drawMap(flights) {
   }
 
   // Draw lines connecting them
-  const polyline = L.polyline(latlngs, {
+  const polyline = L.polyline(geodesicPath(latlngs), {
     color: '#4f46e5',
     weight: 3,
     opacity: 0.7,
