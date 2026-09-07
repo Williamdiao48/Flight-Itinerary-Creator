@@ -152,15 +152,6 @@ async function planFlight() {
   console.log(`Total Frontend-to-Backend-to-UI time: ${(end - start) / 1000}s`);
 }
 
-// Parses a backend "YYYY-MM-DD HH:MM:SS" wall-clock string on a fixed UTC offset.
-// The result is NOT the real instant -- it is only meaningful when differenced against
-// another string from the same timezone, which is what layover math needs. Reading it
-// as UTC keeps the browser's own timezone (and its DST jumps) out of the arithmetic.
-function parseLocalString(s) {
-  if (typeof s !== "string") return NaN;
-  return Date.parse(s.trim().replace(" ", "T") + "Z");
-}
-
 function formatDuration(seconds) {
   let minutes = seconds / 60;
   const hours = Math.floor(minutes / 60);
@@ -212,14 +203,14 @@ function createItineraryCard(data) {
     // Calculate layover duration between this flight and the next
     if (i < data.flights.length - 1) {
       const nextFlight = data.flights[i + 1];
-      // A connection happens at a single airport (flight.to === nextFlight.from), so
-      // flight.arrival and nextFlight.departure are both wall-clock strings in that one
-      // airport's timezone. Parsing them on a common fixed offset makes the difference
-      // the true elapsed layover, independent of whichever timezone the viewer is in.
-      const layoverMs = parseLocalString(nextFlight.departure) - parseLocalString(flight.arrival);
+      // Measure the layover on the UTC epochs, never on the displayed strings. Those
+      // are local wall clock at the connecting airport, so if the clocks move while
+      // the passenger waits -- a DST boundary during the connection -- their
+      // difference is off by exactly the hour that was added or removed.
+      const layoverSec = nextFlight.departure_utc - flight.arrival_utc;
       let layoverStr = "";
-      if (!isNaN(layoverMs) && layoverMs > 0) {
-        layoverStr = ` (${formatDuration(layoverMs / 1000)})`;
+      if (Number.isFinite(layoverSec) && layoverSec > 0) {
+        layoverStr = ` (${formatDuration(layoverSec)})`;
       }
       segmentsHtml += `<div class="layover-row">Connection at ${flight.to}${layoverStr}</div>`;
     }

@@ -175,6 +175,8 @@ Returns `outbound` and `return_flight` itinerary lists:
       "to_lat": 40.63993, "to_lon": -73.77869,
       "departure": "2026-06-01 08:00:00",
       "arrival": "2026-06-01 17:00:00",
+      "departure_utc": 1780326000,
+      "arrival_utc": 1780347600,
       "duration": 21600, "price": 500.0
     }]
   }],
@@ -185,9 +187,15 @@ Returns `outbound` and `return_flight` itinerary lists:
 Durations are in seconds. **`departure` and `arrival` are local wall-clock times
 at their own airport**, not a shared timezone. The example above shows why that
 matters: 08:00 to 17:00 reads as nine hours, but `duration` is 21600 seconds --
-six hours -- because the departure is Pacific and the arrival is Eastern. Do not
-subtract the two strings unless they come from the same airport. Internally
-everything is UTC epochs; the conversion happens on the way out.
+six hours -- because the departure is Pacific and the arrival is Eastern.
+
+Those two strings are for display only. **Measure intervals with
+`departure_utc` and `arrival_utc`**, which carry the same instants as UTC
+epochs. This holds even for two times at the same airport: a layover that
+straddles a daylight-saving boundary spans an hour that the local clock either
+repeats or skips, so the wall-clock difference is off by exactly that hour while
+the epochs stay correct. Internally the planner works in UTC epochs throughout;
+the local strings are rendered on the way out.
 
 Results are cached in memory for one hour per route and date, since Duffel bills
 per request and adjusting filters re-searches the same route.
@@ -250,9 +258,6 @@ missing, so a fresh checkout needs no manual step.
 
 - **`adults` is ignored.** The field is accepted, but the Duffel request
   hardcodes a single adult passenger. Group pricing is not implemented.
-- **Layovers across a DST change at the connecting airport** can be off by an
-  hour in the UI, which computes them from the local wall-clock strings. Fixing
-  it properly means returning the UTC epochs alongside them.
 - `provided.cpp` prints a `DEBUG: AirportDB attempting to open:` line on every
   search.
 - `backend/cpp/main.cpp` checks `argc < 5` but reads up to `argv[6]`, so passing

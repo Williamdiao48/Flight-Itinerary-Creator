@@ -14,6 +14,11 @@ class Flight(BaseModel):
     to_lon: Optional[float] = None
     departure: str
     arrival: str
+    # The same two instants as UTC epochs. The strings above are local wall clock
+    # at each airport and are for display only -- differencing them is unsafe
+    # across a DST boundary. Any arithmetic the client needs uses these.
+    departure_utc: int
+    arrival_utc: int
     duration: int
     price: float
     model_config = {"populate_by_name": True}

@@ -80,6 +80,34 @@ def search_airports(q: str = ""):
         
     return final_results
 
+def decorate_itineraries(itineraries):
+    """Attach airport coordinates and render times for display.
+
+    The planner works in UTC epochs throughout. Here each flight gains the
+    local wall-clock strings the UI shows, while the original epochs are kept
+    alongside them as departure_utc/arrival_utc. Clients that need to measure
+    an interval -- a layover spans two flights and can cross a DST boundary at
+    the connecting airport -- must use the epochs; differencing the wall-clock
+    strings drops or gains the hour the clocks moved.
+    """
+    for itinerary in itineraries:
+        for flight in itinerary["flights"]:
+            from_tz = airport_timezone(flight["from"])
+            to_tz = airport_timezone(flight["to"])
+
+            from_info = iata_db.get(flight["from"], {})
+            to_info = iata_db.get(flight["to"], {})
+            flight["from_lat"] = from_info.get("lat", 0.0)
+            flight["from_lon"] = from_info.get("lon", 0.0)
+            flight["to_lat"] = to_info.get("lat", 0.0)
+            flight["to_lon"] = to_info.get("lon", 0.0)
+
+            flight["departure_utc"] = flight["departure"]
+            flight["arrival_utc"] = flight["arrival"]
+            flight["departure"] = utc_epoch_to_local_string(flight["departure"], from_tz)
+            flight["arrival"] = utc_epoch_to_local_string(flight["arrival"], to_tz)
+
+
 @app.post("/plan", response_model = PlanResponse)
 async def plan_flight(request: PlanRequest):
     start = time.perf_counter()
@@ -122,20 +150,7 @@ async def plan_flight(request: PlanRequest):
         request.max_price
     )
 
-    for itinerary in itinerary_outbound:
-        for flight in itinerary["flights"]:
-            from_tz = airport_timezone(flight["from"])
-            to_tz = airport_timezone(flight["to"])
-
-            from_info = iata_db.get(flight["from"], {})
-            to_info = iata_db.get(flight["to"], {})
-            flight["from_lat"] = from_info.get("lat", 0.0)
-            flight["from_lon"] = from_info.get("lon", 0.0)
-            flight["to_lat"] = to_info.get("lat", 0.0)
-            flight["to_lon"] = to_info.get("lon", 0.0)
-
-            flight["departure"] = utc_epoch_to_local_string(flight["departure"], from_tz)
-            flight["arrival"] = utc_epoch_to_local_string(flight["arrival"], to_tz)
+    decorate_itineraries(itinerary_outbound)
 
     itinerary_return = None
     if request.trip_type == "round-trip" and request.return_date:
@@ -170,20 +185,7 @@ async def plan_flight(request: PlanRequest):
             request.max_price
         )
 
-        for itinerary in itinerary_return:
-            for flight in itinerary["flights"]:
-                from_tz = airport_timezone(flight["from"])
-                to_tz = airport_timezone(flight["to"])
-
-                from_info = iata_db.get(flight["from"], {})
-                to_info = iata_db.get(flight["to"], {})
-                flight["from_lat"] = from_info.get("lat", 0.0)
-                flight["from_lon"] = from_info.get("lon", 0.0)
-                flight["to_lat"] = to_info.get("lat", 0.0)
-                flight["to_lon"] = to_info.get("lon", 0.0)
-
-                flight["departure"] = utc_epoch_to_local_string(flight["departure"], from_tz)
-                flight["arrival"] = utc_epoch_to_local_string(flight["arrival"], to_tz)
+        decorate_itineraries(itinerary_return)
 
 
     end = time.perf_counter()
