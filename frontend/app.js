@@ -144,14 +144,17 @@ function formatDuration(seconds) {
   return `${hours}h ${formattedMins}m`;
 }
 
+// Clearing the inline display lets .input-group's own `display: flex` apply.
+// Setting it to 'block' instead would win over the class and cost these two
+// groups the 8px label-to-input gap every other field has.
 function toggleReturnDate() {
   const type = document.getElementById('trip_type').value;
-  document.getElementById('return_date_group').style.display = type === 'round-trip' ? 'block' : 'none';
+  document.getElementById('return_date_group').style.display = type === 'round-trip' ? '' : 'none';
 }
 
 function toggleCustomWindow() {
   const windowType = document.getElementById('departure_window').value;
-  document.getElementById('custom_window_group').style.display = windowType === 'custom' ? 'block' : 'none';
+  document.getElementById('custom_window_group').style.display = windowType === 'custom' ? '' : 'none';
 }
 
 // The badge on the first result names what the ranking actually optimised for.

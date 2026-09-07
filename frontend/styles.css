@@ -110,16 +110,28 @@ input:focus {
 }
 
 .search-bubble {
-    display: flex;
-    flex-wrap: wrap;
+    /* Grid rather than flex-wrap: a wrapped flex row distributes space on its own,
+       so a field left alone on the last row stretches across the panel. Grid
+       column tracks are shared by every row, so a lone field lands in column one
+       at exactly the width the fields above it have. */
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 20px;
-    align-items: flex-end;
+    align-items: end;
+}
+
+/* The collapsible panel holds its own fields, so give it the full row instead of
+   squeezing it into a single column. */
+.search-bubble .advanced-settings {
+    grid-column: 1 / -1;
 }
 
 .input-group {
     display: flex;
     flex-direction: column;
     gap: 8px;
+    /* Only meaningful inside .preference-section, which is still a flex row. In
+       .search-bubble the grid track sets the width. */
     flex: 1 1 200px;
 }
 
