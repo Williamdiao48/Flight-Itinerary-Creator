@@ -539,6 +539,24 @@ h2 {
     z-index: 2;
 }
 
+/* Badge on the top result. Its text is set in JS and names the mode's objective
+   -- Cheapest, Fastest, or Best Value -- so it can be a couple of words wider or
+   narrower than it looks here. */
+.result-badge {
+    font-size: 0.8rem;
+    background: var(--primary-color);
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-left: 10px;
+    /* Optical alignment against the "Option N" heading. A shared baseline is not
+       enough: the badge is 0.8rem against the heading's 1.1rem, so its capitals
+       rise ~9px where the heading's rise ~12px and the smaller text reads as
+       sunk. Lift it by half that difference so the two blocks of type look
+       centred on each other. Measured from the baseline, so raise/lower here. */
+    vertical-align: 2px;
+}
+
 .layover-row {
     text-align: center;
     font-size: 0.85rem;

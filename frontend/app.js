@@ -94,15 +94,7 @@ async function planFlight() {
       let allMapFlights = [];
 
       data.outbound.forEach((itinerary, index) => {
-          const label = document.createElement('h3');
-          label.textContent = `Option ${index + 1}`;
-          label.style.marginTop = '15px';
-          label.style.marginBottom = '5px';
-          label.style.fontSize = '1.1rem';
-          label.style.color = 'var(--text-secondary, #6b7280)';
-          if (index === 0) {
-              label.innerHTML += ' <span style="font-size: 0.8rem; background: var(--primary-color, #4f46e5); color: white; padding: 2px 6px; border-radius: 4px; margin-left: 10px; vertical-align: middle;">Best Value</span>';
-          }
+          const label = createOptionLabel(index, input.search_mode);
           resultElement.appendChild(label);
           resultElement.appendChild(createItineraryCard(itinerary));
           
@@ -118,15 +110,7 @@ async function planFlight() {
         resultElement.appendChild(retHeader);
 
         data.return_flight.forEach((itinerary, index) => {
-            const label = document.createElement('h3');
-            label.textContent = `Option ${index + 1}`;
-            label.style.marginTop = '15px';
-            label.style.marginBottom = '5px';
-            label.style.fontSize = '1.1rem';
-            label.style.color = 'var(--text-secondary, #6b7280)';
-            if (index === 0) {
-                label.innerHTML += ' <span style="font-size: 0.8rem; background: var(--primary-color, #4f46e5); color: white; padding: 2px 6px; border-radius: 4px; margin-left: 10px; vertical-align: middle;">Best Value</span>';
-            }
+            const label = createOptionLabel(index, input.search_mode);
             resultElement.appendChild(label);
             resultElement.appendChild(createItineraryCard(itinerary));
             
@@ -168,6 +152,32 @@ function toggleReturnDate() {
 function toggleCustomWindow() {
   const windowType = document.getElementById('departure_window').value;
   document.getElementById('custom_window_group').style.display = windowType === 'custom' ? 'block' : 'none';
+}
+
+// The badge on the first result names what the ranking actually optimised for.
+// Every mode minimises duration + price_weight * price, so no mode returns the
+// strictly cheapest or strictly quickest itinerary -- frugal at 1000 s/$ will
+// still prefer a direct flight over one $9 cheaper but three hours longer, since
+// $9 only buys 2h30m. These say which term dominates, which is the true claim.
+const MODE_BADGES = {
+  frugal: 'Price First',
+  fast: 'Time First',
+  balanced: 'Best Value'
+};
+
+function createOptionLabel(index, searchMode) {
+  const label = document.createElement('h3');
+  label.textContent = `Option ${index + 1}`;
+  label.style.marginTop = '15px';
+  label.style.marginBottom = '5px';
+  label.style.fontSize = '1.1rem';
+  label.style.color = 'var(--text-secondary, #6b7280)';
+
+  if (index === 0) {
+    const badge = MODE_BADGES[searchMode] || MODE_BADGES.balanced;
+    label.innerHTML += ` <span class="result-badge">${badge}</span>`;
+  }
+  return label;
 }
 
 function createItineraryCard(data) {
