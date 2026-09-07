@@ -9,6 +9,13 @@
     --text-secondary: #6b7280;
     --box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
     --transition-fast: 0.2s ease;
+
+    /* Geometry of a segment row. The layover line below it is aligned to the
+       flight path region using these, so it centres between the two airports
+       rather than across the whole card. */
+    --segment-row-pad-x: 20px;
+    --segment-row-gap: 20px;
+    --segment-airline-w: 100px;
 }
 
 body {
@@ -73,6 +80,20 @@ input {
     outline: none;
     transition: all var(--transition-fast);
     background: white;
+}
+
+/* The native arrow is drawn by the browser and its position is not reliably
+   controlled by padding -- Safari in particular ignores it. Draw our own instead
+   so the gap to the border is an actual number we set. */
+select {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    padding-right: 40px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='none' stroke='%236b7280' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round' d='M1 1.5 6 6.5 11 1.5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    background-size: 12px 8px;
 }
 
 select:focus,
@@ -465,13 +486,13 @@ h2 {
     display: flex;
     align-items: center;
     background: #f8fafc;
-    padding: 12px 20px;
+    padding: 12px var(--segment-row-pad-x);
     border-radius: 10px;
-    gap: 20px;
+    gap: var(--segment-row-gap);
 }
 
 .segment-airline {
-    flex: 0 0 100px;
+    flex: 0 0 var(--segment-airline-w);
     font-weight: 700;
     font-size: 0.95rem;
     color: var(--primary-color);
@@ -523,7 +544,10 @@ h2 {
     font-size: 0.85rem;
     font-weight: 600;
     color: #f59e0b;
-    padding: 4px 0;
+    /* Inset by the airline column so the text centres over .segment-path -- the
+       span between the two airports -- and not over the full card width. */
+    padding: 4px var(--segment-row-pad-x) 4px
+        calc(var(--segment-row-pad-x) + var(--segment-airline-w) + var(--segment-row-gap));
 }
 
 #map {
