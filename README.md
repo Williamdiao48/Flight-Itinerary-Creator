@@ -8,6 +8,18 @@ Rather than showing whatever an airline API returns, it treats the segments as a
 graph and searches for genuinely good combinations — including connections the
 provider never offers as a single bookable route.
 
+![Searching SFO to SGN, then switching between the three search modes](docs/images/demo.gif)
+
+One search, three rankings. The segments are fetched once and cached; switching
+mode only changes `price_weight`, so the re-rank is a local search rather than
+another provider round trip. Same route, same date:
+
+| Mode | Top result | Time | Price |
+|---|---|---|---|
+| Balanced | non-stop | 17h 22m | $479.59 |
+| Frugal | via PVG | 23h 35m | $454.80 |
+| Fast | non-stop | 15h 40m | $581.50 |
+
 ---
 
 ## How it works
@@ -191,8 +203,12 @@ airport.
 | `preferred_airlines` | list | `null` | IATA carrier codes, e.g. `["DL","UA"]` |
 | `max_results` | int | `3` | Itineraries per direction |
 | `max_duration_hours` | int | `48` | |
-| `max_price` | float | `100000.0` | Per direction |
+| `max_price` | float | `100000.0` | Per direction; the form defaults to `10000` |
 | `adults` | int | `1` | Accepted but not yet honoured — see below |
+
+All of these are exposed in the UI: most sit in the search bar, with
+`max_duration_hours` and `max_price` behind the **Advanced Constraints**
+disclosure.
 
 Returns `outbound` and `return_flight` itinerary lists:
 
