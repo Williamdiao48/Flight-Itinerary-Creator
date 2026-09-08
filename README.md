@@ -323,10 +323,6 @@ missing, so a fresh checkout needs no manual step.
 
 - **`adults` is ignored.** The field is accepted, but the Duffel request
   hardcodes a single adult passenger. Group pricing is not implemented.
-- **Provider fetches block the event loop.** `services.py` calls the synchronous
-  `requests` client from inside `async def plan_trip`, so a cold search holds the
-  loop for the whole Duffel round trip (~3s measured above) and concurrent
-  searches serialise rather than overlap. An async client is the fix.
 - `provided.cpp` prints a `DEBUG: AirportDB attempting to open:` line on every
   search.
 - `backend/cpp/main.cpp` checks `argc < 5` but reads up to `argv[6]`, so passing
