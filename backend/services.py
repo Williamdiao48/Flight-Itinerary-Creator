@@ -2,7 +2,6 @@ from datetime import datetime, timezone
 import zoneinfo
 from models import PlanRequest # pyre-ignore
 import airportsdata # pyre-ignore
-import subprocess
 import time
 import os
 from dotenv import load_dotenv # pyre-ignore

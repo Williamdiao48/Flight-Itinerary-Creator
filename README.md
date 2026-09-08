@@ -80,6 +80,19 @@ Two details worth knowing if you read the code:
   is deliberately **not** applied at the destination. Applying it there would
   discard every route after the first and make `max_results` meaningless.
 
+### Time
+
+Everything inside the planner is a UTC epoch. Local wall-clock strings are
+rendered only on the way out, in each airport's own timezone, because that is
+what a traveller reads off a boarding pass — and they are never subtracted.
+
+That distinction is not cosmetic. A layover happens at a single airport, so
+differencing the two displayed times looks safe; it breaks across a
+daylight-saving transition, where the local clock repeats or skips an hour and a
+four-hour wait renders as three. Responses therefore carry `departure_utc` and
+`arrival_utc` beside the display strings, and every interval is measured on
+those. Field-level detail under [`POST /plan`](#post-plan).
+
 ### Caching
 
 Provider responses are cached in-process under a `source-destination-date` key
@@ -206,9 +219,10 @@ airport.
 | `max_price` | float | `100000.0` | Per direction; the form defaults to `10000` |
 | `adults` | int | `1` | Accepted but not yet honoured — see below |
 
-All of these are exposed in the UI: most sit in the search bar, with
-`max_duration_hours` and `max_price` behind the **Advanced Constraints**
-disclosure.
+Most of these are exposed in the UI, with `max_duration_hours` and `max_price`
+behind the **Advanced Constraints** disclosure. Two are not: `origin_timezone` is
+resolved server-side from the origin airport, and `adults` is fixed at 1 by the
+front end.
 
 Returns `outbound` and `return_flight` itinerary lists:
 
@@ -309,6 +323,10 @@ missing, so a fresh checkout needs no manual step.
 
 - **`adults` is ignored.** The field is accepted, but the Duffel request
   hardcodes a single adult passenger. Group pricing is not implemented.
+- **Provider fetches block the event loop.** `services.py` calls the synchronous
+  `requests` client from inside `async def plan_trip`, so a cold search holds the
+  loop for the whole Duffel round trip (~3s measured above) and concurrent
+  searches serialise rather than overlap. An async client is the fix.
 - `provided.cpp` prints a `DEBUG: AirportDB attempting to open:` line on every
   search.
 - `backend/cpp/main.cpp` checks `argc < 5` but reads up to `argv[6]`, so passing
