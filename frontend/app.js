@@ -381,12 +381,21 @@ function greatCirclePoints(start, end, steps = GEODESIC_STEPS) {
 }
 
 // One continuous great-circle path through every waypoint of the itinerary.
+// Returns the path plus `joints`, the index in that path of each original
+// waypoint, so markers can be placed on the same unwrapped coordinates the line
+// uses rather than on the raw ones.
 function geodesicPath(waypoints) {
+  if (waypoints.length < 2) {
+    return { path: waypoints.slice(), joints: waypoints.map((_, i) => i) };
+  }
+
   const path = [];
+  const joints = [0];
   for (let i = 0; i < waypoints.length - 1; i++) {
     const segment = greatCirclePoints(waypoints[i], waypoints[i + 1]);
     // Each segment repeats the previous segment's final point; drop the duplicate.
     path.push(...(i === 0 ? segment : segment.slice(1)));
+    joints.push(path.length - 1);
   }
 
   // A route crossing the antimeridian produces longitudes that jump from +179 to
@@ -401,7 +410,7 @@ function geodesicPath(waypoints) {
       path[i][1] += 360;
     }
   }
-  return path;
+  return { path, joints };
 }
 
 function drawMap(flights) {
@@ -422,8 +431,6 @@ function drawMap(flights) {
     attribution: '© OpenStreetMap contributors'
   }).addTo(map);
 
-  const latlngs = [];
-
   // Custom icons (simple colored dots for airports)
   const waypointIcon = L.divIcon({
     className: 'custom-div-icon',
@@ -432,26 +439,33 @@ function drawMap(flights) {
     iconAnchor: [6, 6]
   });
 
+  const waypoints = [];
+  const labels = [];
+
   for (let i = 0; i < flights.length; i++) {
     const f = flights[i];
+    waypoints.push([f.from_lat, f.from_lon]);
+    labels.push(f.from);
 
-    // Add source pin
-    const sourcePt = [f.from_lat, f.from_lon];
-    latlngs.push(sourcePt);
-    L.marker(sourcePt, { icon: waypointIcon }).addTo(map)
-      .bindPopup(`<b>${f.from}</b>`);
-
-    // Add destination pin
-    const destPt = [f.to_lat, f.to_lon];
     if (i === flights.length - 1) { // Final destination
-      latlngs.push(destPt);
-      L.marker(destPt, { icon: waypointIcon }).addTo(map)
-        .bindPopup(`<b>${f.to}</b>`);
+      waypoints.push([f.to_lat, f.to_lon]);
+      labels.push(f.to);
     }
   }
 
+  // Place the pins on the path's own coordinates, not the raw ones. On a route
+  // that crosses the antimeridian the line is unwrapped past +-180 -- LAX sits
+  // near +241 on a trans-Pacific path -- so a pin left at -118 lands in the world
+  // copy to the west and falls outside the view fitted to the line.
+  const { path, joints } = geodesicPath(waypoints);
+
+  joints.forEach((index, i) => {
+    L.marker(path[index], { icon: waypointIcon }).addTo(map)
+      .bindPopup(`<b>${labels[i]}</b>`);
+  });
+
   // Draw lines connecting them
-  const polyline = L.polyline(geodesicPath(latlngs), {
+  const polyline = L.polyline(path, {
     color: '#4f46e5',
     weight: 3,
     opacity: 0.7,
