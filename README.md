@@ -68,6 +68,41 @@ Two details worth knowing if you read the code:
   is deliberately **not** applied at the destination. Applying it there would
   discard every route after the first and make `max_results` meaningless.
 
+### Caching
+
+Provider responses are cached in-process under a `source-destination-date` key
+with a one-hour TTL (`services.py`). Fares are volatile, so the cache trades a
+bounded staleness window for speed rather than trying to stay authoritative.
+
+The key deliberately excludes `search_mode`. The modes differ only in
+`price_weight`, which changes how the same segments are *ranked*, not which
+segments exist — so one fetch serves all three, and switching modes costs a
+search rather than a round trip.
+
+Measured on `PDX->KUL` for `2026-10-05`, a route with nothing cached:
+
+```
+cold  (Duffel fetch + search)   3100.2 ms
+warm  (cache hit + search)         5.8 ms
+warm                               5.0 ms
+warm                               4.4 ms
+
+same cache entry, other modes:
+frugal                             4.1 ms
+fast                               4.7 ms
+```
+
+Roughly 600x, or 99.85% off the request. Note what the warm figure includes: the
+C++ search runs in full every time, and only the network fetch is skipped — so
+~4ms is the planner's actual cost, not a dictionary lookup. `frugal` and `fast`
+were never fetched for this route and still returned in that time, which is the
+shared key doing its job.
+
+The cold number is a single sample and moves with Duffel's load; treat 1-5s as
+the range and this as one draw from it. The cache is a module-level dict, so it
+is per-process and does not survive a restart — fine for a single-process
+deployment, and the thing to replace first if this ever ran on more than one.
+
 ---
 
 ## Requirements
