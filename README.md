@@ -316,8 +316,9 @@ frontend/
   index.html, app.js, styles.css
 ```
 
-`backend/cpp/airports.txt` is regenerated from `airportsdata` on first run if
-missing, so a fresh checkout needs no manual step.
+`backend/cpp/airports.txt` is committed, and `services.py` regenerates it from
+`airportsdata` if it is ever missing, so a fresh checkout needs no manual step
+either way.
 
 ## Notes and known gaps
 
